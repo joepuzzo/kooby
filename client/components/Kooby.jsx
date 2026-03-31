@@ -228,7 +228,10 @@ const Conversation = ({
   }, [conversation]);
 
   const filteredConvo = conversation.filter(
-    (message) => message.role !== "system" && message.role !== "tool",
+    (message) =>
+      message.role !== "system" &&
+      message.role !== "tool" &&
+      !message.tool_calls,
   );
 
   return (
@@ -382,7 +385,9 @@ const defaultGreetingMessage = (agent) => ({
 
 const initializeConversation = ({ agent, initialConversation }) => {
   if (initialConversation && initialConversation.length > 0) {
-    return initialConversation.filter((message) => message.role !== "tool");
+    return initialConversation.filter(
+      (message) => message.role !== "tool" && !message.tool_calls,
+    );
   }
   return [defaultGreetingMessage(agent)];
 };
