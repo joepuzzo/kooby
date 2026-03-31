@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.4 ( March 31st, 2026 )
+
+### Added
+
+- Tooltip labels on icon action buttons using `TooltipTrigger` + `Tooltip` (copy message, feedback actions, reset, expand) for clearer UI affordances.
+
 ## 1.0.3 ( March 31st, 2026 )
 
 ### Added

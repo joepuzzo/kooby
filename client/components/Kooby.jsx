@@ -9,6 +9,8 @@ import {
   ProgressCircle,
   Text,
   TextArea,
+  Tooltip,
+  TooltipTrigger,
 } from "@react-spectrum/s2";
 import Copy from "@react-spectrum/s2/icons/Copy";
 import OpenIn from "@react-spectrum/s2/icons/OpenIn";
@@ -42,9 +44,12 @@ const FeedbackField = ({
 
   return (
     <DialogTrigger isOpen={open} onOpenChange={setOpen}>
-      <ActionButton isQuiet aria-label={title}>
-        <Icon />
-      </ActionButton>
+      <TooltipTrigger>
+        <ActionButton isQuiet aria-label={title}>
+          <Icon />
+        </ActionButton>
+        <Tooltip>{title}</Tooltip>
+      </TooltipTrigger>
       <Popover size="S">
         <div style={{ padding: 12 }}>
           <Heading>{title}</Heading>
@@ -130,9 +135,12 @@ const Feedback = ({
   if (show) {
     return (
       <div className="kooby-feedback">
-        <ActionButton isQuiet aria-label="Copy message" onPress={copyMessage}>
-          <Copy />
-        </ActionButton>
+        <TooltipTrigger>
+          <ActionButton isQuiet aria-label="Copy message" onPress={copyMessage}>
+            <Copy />
+          </ActionButton>
+          <Tooltip>Copy message</Tooltip>
+        </TooltipTrigger>
         {positive && (
           <FeedbackField
             icon={ThumbUp}
@@ -329,14 +337,20 @@ const Toolbar = ({ children, expandable = true, reset = true }) => {
     <div className="kooby-toolbar">
       {children ? children({ agent, conversation, socketId }) : null}
       {reset && (
-        <ActionButton aria-label="Reset" onPress={resetConversation}>
-          <Refresh />
-        </ActionButton>
+        <TooltipTrigger>
+          <ActionButton aria-label="Reset" onPress={resetConversation}>
+            <Refresh />
+          </ActionButton>
+          <Tooltip>Reset</Tooltip>
+        </TooltipTrigger>
       )}
       {expandable && (
-        <ActionButton aria-label="Expand" onPress={toggleFocus}>
-          <OpenIn />
-        </ActionButton>
+        <TooltipTrigger>
+          <ActionButton aria-label="Expand" onPress={toggleFocus}>
+            <OpenIn />
+          </ActionButton>
+          <Tooltip>Expand</Tooltip>
+        </TooltipTrigger>
       )}
     </div>
   );
