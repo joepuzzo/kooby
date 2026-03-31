@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2 ( March 31st, 2026 )
+
+### Fixed
+
+- Issue where readme was not showing on NPM
+
 ## 1.0.1 ( March 31st, 2026 )
 
 ### Fixed
