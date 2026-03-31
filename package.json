@@ -1,0 +1,71 @@
+{
+  "name": "kooby",
+  "version": "1.3.2",
+  "description": "",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "type": "module",
+  "files": [
+    "dist/"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "vite": "vite",
+    "serve:local": "nodemon",
+    "start:dev": "LOG_PRETTY=true concurrently --raw \"npm run serve:local\" \"npm run vite\"",
+    "build": "rm -rf dist && rollup --config",
+    "visualize": "VISUALIZE=true npm run build",
+    "version": "npm run build",
+    "prepare": "npm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "markdown-to-jsx": "^7.7.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.15.5",
+    "@babel/plugin-proposal-class-properties": "^7.4.0",
+    "@babel/preset-env": "^7.15.4",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/traverse": "^7.23.2",
+    "@react-spectrum/s2": "^1.0.0",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^28.0.3",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "chalk": "^5.4.1",
+    "concurrently": "^9.1.2",
+    "dotenv": "^17.3.1",
+    "express": "^4.21.2",
+    "informed": "^4.64.2",
+    "mermaid": "^11.5.0",
+    "nodemon": "^3.1.9",
+    "openai": "^4.86.1",
+    "qrcode": "^1.5.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.5.3",
+    "rollup": "^4.40.0",
+    "rollup-plugin-analyzer": "^4.0.0",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-visualizer": "^5.14.0",
+    "unplugin-parcel-macros": "^0.2.0",
+    "vite": "^5.4.14",
+    "ws": "^8.18.1"
+  },
+  "peerDependencies": {
+    "@react-spectrum/s2": "^1.0.0",
+    "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
+  },
+  "optionalDependencies": {
+    "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
+  }
+}

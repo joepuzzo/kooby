@@ -1,0 +1,5 @@
+{
+  "watch": ["server"],
+  "ext": "js",
+  "exec": "NODE_OPTIONS=--experimental-repl-await node ./server/index.js"
+}

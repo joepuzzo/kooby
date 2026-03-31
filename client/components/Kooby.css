@@ -1,0 +1,213 @@
+.kooby {
+  width: 100%;
+  max-width: 1000px;
+  height: 100%;
+  max-height: 90vh;
+  padding: 30px;
+  padding-top: 50px;
+  border: 1px solid var(--kooby-border, rgba(0, 0, 0, 0.15));
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  color: #000;
+}
+
+.site--app[data-theme="dark"] .kooby,
+[data-color-scheme="dark"] .kooby {
+  border: none;
+  box-shadow: 0 0 2px rgba(255, 255, 255, 0.12);
+  background-color: var(--kooby-panel-bg, rgba(30, 30, 30, 0.95));
+  color: #fff;
+}
+
+.kooby-focus {
+  width: 100%;
+  max-width: 100%;
+}
+
+.kooby-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.kooby-conversation {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  flex: 2;
+  overflow: scroll;
+
+  scrollbar-width: none;
+}
+
+.kooby-conversation::-webkit-scrollbar {
+  display: none;
+}
+
+.kooby-text-box {
+  flex: 0 0 auto;
+}
+
+.kooby-message {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.kooby-message-role {
+  min-width: 100px;
+  height: 40px;
+  padding: 10px;
+  border-radius: 5px 0 0 5px;
+  display: flex;
+  align-items: center;
+  /* justify-content: center; */
+}
+
+.kooby-message-role strong {
+  color: #000;
+}
+
+[data-color-scheme="dark"] .kooby-message-role strong {
+  color: #fff;
+}
+
+.kooby-system {
+  background-color: #d3d3d3;
+}
+
+.kooby-assistant {
+  background-color: #d3d3d3;
+}
+
+[data-color-scheme="dark"] .kooby-system,
+[data-color-scheme="dark"] .kooby-assistant {
+  background-color: #3a3a3a;
+}
+
+.kooby-user {
+  background-color: rgb(59, 99, 251);
+}
+
+.kooby-user strong {
+  color: white;
+}
+
+[data-color-scheme="dark"] .kooby-user strong {
+  color: white;
+}
+
+.kooby-content {
+  padding: 10px;
+  width: 100%;
+  text-align: left;
+  color: #000;
+  margin-top: 10px;
+}
+
+[data-color-scheme="dark"] .kooby-content {
+  color: #fff;
+}
+
+.kooby-content :where(p, li, td, th, span, strong, em, h1, h2, h3, h4, h5, h6) {
+  color: inherit;
+}
+
+.kooby .mermaid {
+  background-color: white;
+  border-radius: 5px;
+  padding: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.kooby-debug {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 30vw;
+  height: 100vh;
+  color: #111;
+  overflow-y: auto;
+  z-index: 1000;
+  padding: 30px;
+  background-color: white;
+}
+
+[data-color-scheme="dark"] .kooby-debug {
+  color: #f5f5f5;
+  background-color: var(--kooby-panel-bg, rgba(30, 30, 30));
+}
+
+.kooby-debug pre {
+  white-space: pre-wrap;
+}
+
+.kooby-debug-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.kooby-debug-actions button {
+  font-size: 1rem;
+  padding: 4px 8px;
+  height: auto;
+  min-height: unset;
+}
+
+.kooby-feedback {
+  display: flex;
+  margin-top: 10px;
+  align-items: center;
+  gap: 6px;
+}
+
+.qr-code {
+  width: 200px;
+}
+
+.qr {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.qr code {
+  font-size: 12px;
+}
+
+.qr-download {
+  width: 200px;
+}
+
+.site--app {
+  min-height: 100vh;
+  color: #000;
+}
+
+[data-color-scheme="dark"] .site--app {
+  color: #fff;
+}
+
+.site--app h1 {
+  color: inherit;
+}
+
+.site--app-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
