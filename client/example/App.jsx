@@ -1,6 +1,7 @@
 import { ActionButton, Button, Provider, Text } from "@react-spectrum/s2";
 import BrightnessContrast from "@react-spectrum/s2/icons/BrightnessContrast";
 import Copy from "@react-spectrum/s2/icons/Copy";
+import FileText from "@react-spectrum/s2/icons/FileText";
 import Settings from "@react-spectrum/s2/icons/Settings";
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -22,7 +23,12 @@ export const mdjsx = {
   },
 };
 
-const CustomToolbar = ({ conversation, toggleTheme, isDarkTheme }) => {
+const CustomToolbar = ({
+  conversation,
+  toggleTheme,
+  isDarkTheme,
+  socketId,
+}) => {
   const [useSuccessIcon, setUseSuccessIcon] = useState(false);
 
   const copyConversation = () => {
@@ -30,41 +36,8 @@ const CustomToolbar = ({ conversation, toggleTheme, isDarkTheme }) => {
     navigator.clipboard.writeText(conversationJson);
   };
 
-  const copyTestData = () => {
-    const timestamp = Math.floor(Date.now() / 1000);
-    const testData = {
-      id: `${timestamp}`,
-      conversation: conversation
-        .filter((msg) => msg.role === "user" || msg.role === "assistant")
-        .reduce((pairs, msg, index, array) => {
-          if (msg.role === "user") {
-            const assistantResponse = array[index + 1];
-            if (assistantResponse && assistantResponse.role === "assistant") {
-              pairs.push({
-                question: msg.content,
-                expected_response: assistantResponse.content,
-              });
-            }
-          }
-          return pairs;
-        }, []),
-      tags: [],
-    };
-
-    const testJson = JSON.stringify(testData, null, 2);
-
-    navigator.clipboard
-      .writeText(testJson)
-      .then(() => {
-        setUseSuccessIcon(true);
-        setTimeout(() => {
-          setUseSuccessIcon(false);
-        }, 2000);
-      })
-      .catch((err) => {
-        console.error("Failed to copy: ", err);
-        alert("Failed to copy to clipboard");
-      });
+  const copySocketId = () => {
+    navigator.clipboard.writeText(socketId);
   };
 
   return (
@@ -72,9 +45,9 @@ const CustomToolbar = ({ conversation, toggleTheme, isDarkTheme }) => {
       <ActionButton aria-label="Copy conversation" onPress={copyConversation}>
         <Copy />
       </ActionButton>
-      {/* <ActionButton aria-label="Copy test" onPress={copyTestData}>
-        {useSuccessIcon ? <Checkmark /> : <FileText />}
-      </ActionButton> */}
+      <ActionButton aria-label="Copy test" onPress={copySocketId}>
+        <FileText />
+      </ActionButton>
       <ActionButton
         aria-label={isDarkTheme ? "Use light theme" : "Use dark theme"}
         onPress={toggleTheme}
@@ -230,12 +203,13 @@ const App = () => {
               // ]}
             >
               <Kooby.Toolbar>
-                {({ conversation }) => {
+                {({ conversation, socketId }) => {
                   return (
                     <CustomToolbar
                       conversation={conversation}
                       toggleTheme={toggleTheme}
                       isDarkTheme={isDarkTheme}
+                      socketId={socketId}
                     />
                   );
                 }}

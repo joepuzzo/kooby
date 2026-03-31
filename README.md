@@ -217,7 +217,7 @@ Kooby allows you to customize what gets rendered in the toolbar (at the top of t
 ```jsx
 import { Kooby } from "kooby";
 
-const CustomToolbar = ({ agent, conversation }) => {
+const CustomToolbar = ({ agent, conversation, socketId }) => {
   const copyConversation = () => {
     const conversationJson = JSON.stringify(conversation, null, 2);
     navigator.clipboard.writeText(conversationJson);

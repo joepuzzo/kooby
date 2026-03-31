@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.0.3 ( March 31st, 2026 )
+
+### Added
+
+- `socketId` is now generated client-side in `Kooby` and always included in the handshake payload, making it directly accessible through `useKooby()`
+- Example usage: custom toolbar render-prop now receives `socketId` alongside `conversation`, e.g.
+
+```jsx
+const CustomToolbar = ({ socketId }) => {
+  const copySocketId = () => {
+    navigator.clipboard.writeText(socketId);
+  };
+
+  return (
+    <button type="button" onClick={copySocketId} aria-label="Copy SocketId">
+      Copy
+    </button>
+  );
+};
+```
+
 ## 1.0.2 ( March 31st, 2026 )
 
 ### Fixed

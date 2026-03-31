@@ -322,11 +322,12 @@ const TextBox = () => {
 };
 
 const Toolbar = ({ children, expandable = true, reset = true }) => {
-  const { agent, conversation, toggleFocus, resetConversation } = useKooby();
+  const { agent, conversation, toggleFocus, resetConversation, socketId } =
+    useKooby();
 
   return (
     <div className="kooby-toolbar">
-      {children ? children({ agent, conversation }) : null}
+      {children ? children({ agent, conversation, socketId }) : null}
       {reset && (
         <ActionButton aria-label="Reset" onPress={resetConversation}>
           <Refresh />
@@ -372,6 +373,13 @@ const initializeConversation = ({ agent, initialConversation }) => {
   return [defaultGreetingMessage(agent)];
 };
 
+const createSocketId = () => {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return `kooby-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+};
+
 export const Kooby = ({
   debug,
   url,
@@ -403,6 +411,7 @@ export const Kooby = ({
   }, [agent, initialConversation]);
 
   const [isConnected, setIsConnected] = useState(false);
+  const [socketId] = useState(() => createSocketId());
   const [responding, setResponding] = useState(false);
   const [loading, setLoading] = useState(false);
   const socketManagerRef = useRef(null);
@@ -468,6 +477,7 @@ export const Kooby = ({
 
           socketManagerRef.current.sendMessage({
             handshake: true,
+            socketId,
             history,
             metadata: {
               user_agent: navigator.userAgent,
@@ -494,7 +504,7 @@ export const Kooby = ({
         setIsConnected(false);
       }
     };
-  }, [url, agent, token]);
+  }, [url, agent, token, socketId]);
 
   useEffect(() => {
     if (socketManagerRef.current && context) {
@@ -526,6 +536,7 @@ export const Kooby = ({
       setConversation,
       resetConversation,
       isConnected,
+      socketId,
       setIsConnected,
       socketManagerRef: socketManagerRef,
       agent,
@@ -535,7 +546,7 @@ export const Kooby = ({
       setLoading,
       loading,
     }),
-    [conversation, isConnected, agent, responding, context],
+    [conversation, isConnected, socketId, agent, responding, context],
   );
 
   if (apiRef) {
