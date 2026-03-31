@@ -228,7 +228,7 @@ const Conversation = ({
   }, [conversation]);
 
   const filteredConvo = conversation.filter(
-    (message) => message.role !== "system",
+    (message) => message.role !== "system" && message.role !== "tool",
   );
 
   return (
@@ -382,7 +382,7 @@ const defaultGreetingMessage = (agent) => ({
 
 const initializeConversation = ({ agent, initialConversation }) => {
   if (initialConversation && initialConversation.length > 0) {
-    return initialConversation;
+    return initialConversation.filter((message) => message.role !== "tool");
   }
   return [defaultGreetingMessage(agent)];
 };

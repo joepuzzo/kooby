@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.5 ( March 31st, 2026 )
+
+### Updated
+
+- Kooby to not show tool messages
+
 ## 1.0.4 ( March 31st, 2026 )
 
 ### Added
