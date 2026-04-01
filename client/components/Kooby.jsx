@@ -430,7 +430,7 @@ export const Kooby = ({
   }, [agent, initialConversation]);
 
   const [isConnected, setIsConnected] = useState(false);
-  const [socketId] = useState(() => createSocketId());
+  const [socketId] = useState(() => rest.socketId ?? createSocketId());
   const [responding, setResponding] = useState(false);
   const [loading, setLoading] = useState(false);
   const socketManagerRef = useRef(null);

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.7 ( March 31st, 2026 )
+
+### Updated
+
+- Kooby to accept a socketId
+
 ## 1.0.6 ( March 31st, 2026 )
 
 ### Updated
