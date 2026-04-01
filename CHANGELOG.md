@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.8 ( April 1st, 2026 )
+
+### Updated
+
+- Koobys message role pills to be slightly more sleek
+
 ## 1.0.7 ( March 31st, 2026 )
 
 ### Updated
