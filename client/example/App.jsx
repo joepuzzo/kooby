@@ -178,7 +178,7 @@ const App = () => {
     url: urlQueryParam,
   });
 
-  const [kramSelectedNavIndex, setKramSelectedNavIndex] = useState(undefined);
+  const kramApiRef = useRef(null);
 
   const onSubmit = ({ values }) => {
     const { url, context } = values;
@@ -201,9 +201,8 @@ const App = () => {
         <Kram
           nav={kramNav}
           hideLabels
-          selectedNavIndex={kramSelectedNavIndex}
-          onSelect={({ item, index }) => {
-            setKramSelectedNavIndex(index);
+          apiRef={kramApiRef}
+          onSelect={({ item }) => {
             setConfig((prev) => ({
               ...prev,
               context: `Currnet kram selection: ${item.label}`,
@@ -314,7 +313,9 @@ const App = () => {
               metadata={{ kramNav }}
               onUpdate={(update) => {
                 if (update?.kram && "selectedNavIndex" in update.kram) {
-                  setKramSelectedNavIndex(update.kram.selectedNavIndex);
+                  kramApiRef.current?.setSelectedNavIndex?.(
+                    update.kram.selectedNavIndex,
+                  );
                 }
               }}
             >
