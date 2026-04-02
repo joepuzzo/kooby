@@ -411,6 +411,7 @@ export const Kooby = ({
   sendHistory = false,
   apiRef,
   expanded,
+  onUpdate,
   ...rest
 }) => {
   const [focus, setFocus] = useState(false);
@@ -485,6 +486,9 @@ export const Kooby = ({
             console.log("complete");
             setResponding(false);
             setIsConnected(true);
+          }
+          if (data.update && onUpdate) {
+            onUpdate(data.update);
           }
         },
         onOpen: () => {

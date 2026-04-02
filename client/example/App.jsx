@@ -178,6 +178,8 @@ const App = () => {
     url: urlQueryParam,
   });
 
+  const [kramSelectedNavIndex, setKramSelectedNavIndex] = useState(undefined);
+
   const onSubmit = ({ values }) => {
     const { url, context } = values;
 
@@ -199,7 +201,9 @@ const App = () => {
         <Kram
           nav={kramNav}
           hideLabels
-          onSelect={({ item, index, depth }) => {
+          selectedNavIndex={kramSelectedNavIndex}
+          onSelect={({ item, index }) => {
+            setKramSelectedNavIndex(index);
             setConfig((prev) => ({
               ...prev,
               context: `Currnet kram selection: ${item.label}`,
@@ -307,6 +311,12 @@ const App = () => {
               agent="Kooby"
               conversation={koobyConversation}
               socketId={convoId}
+              metadata={{ kramNav }}
+              onUpdate={(update) => {
+                if (update?.kram && "selectedNavIndex" in update.kram) {
+                  setKramSelectedNavIndex(update.kram.selectedNavIndex);
+                }
+              }}
             >
               <Kooby.Toolbar>
                 {({ conversation, socketId }) => {

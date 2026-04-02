@@ -3,7 +3,9 @@ import { OpenAI } from "openai";
 import { getConversationCache } from "./cache.js";
 import logger from "./logger.js";
 import { AdminTool } from "./tools/adminTool.js";
+import { KramTool } from "./tools/kramTool.js";
 import { MathTool } from "./tools/mathTool.js";
+import { prompt1 } from "./prompts/prompt1.js";
 
 /** xAI Grok (OpenAI-compatible): https://docs.x.ai/docs/overview */
 const DEFAULT_BASE_URL = "https://api.x.ai/v1";
@@ -27,10 +29,7 @@ export class Kooby {
       baseURL: process.env.GROK_BASE_URL || DEFAULT_BASE_URL,
     });
     this.model = process.env.GROK_MODEL || DEFAULT_MODEL;
-    this.INITIAL_PROMPT = fs
-      .readFileSync("server/prompts/prompt1.txt", "utf8")
-      .trim();
-    this.tools = [new MathTool(), new AdminTool()];
+    this.tools = [new MathTool(), new AdminTool(), new KramTool()];
     this.toolDefinitions = this.tools.flatMap((tool) =>
       tool.getToolDefinitions(),
     );
@@ -43,6 +42,7 @@ export class Kooby {
     // Handle WebSocket connections
     this.wss.on("connection", (ws) => {
       let socketId = null;
+      let metadata = null;
 
       ws.on("message", async (message) => {
         try {
@@ -187,7 +187,7 @@ export class Kooby {
       // execute tools then loop for the model’s next streamed reply
       if (toolCalls?.length) {
         for (const toolCall of toolCalls) {
-          const toolResult = await this.executeToolCall(toolCall);
+          const toolResult = await this.executeToolCall(toolCall, ws);
           conversationHistory.push({
             role: "tool",
             tool_call_id: toolCall.id,
@@ -220,7 +220,7 @@ export class Kooby {
     return "";
   }
 
-  async executeToolCall(toolCall) {
+  async executeToolCall(toolCall, ws) {
     const functionName = toolCall.function?.name;
     const handler = this.toolHandlers.get(functionName);
     if (!handler) {
@@ -233,7 +233,7 @@ export class Kooby {
       const args = toolCall.function?.arguments
         ? JSON.parse(toolCall.function.arguments)
         : {};
-      const result = await handler(args);
+      const result = await handler(args, { ws });
       return { ok: true, ...result };
     } catch (error) {
       logger.error("Tool execution failed", { functionName, error });
@@ -246,7 +246,10 @@ export class Kooby {
 
     if (handshakeData.history) {
       const messages = [
-        { role: "system", content: this.INITIAL_PROMPT },
+        {
+          role: "system",
+          content: prompt1(handshakeData.metadata ?? {}),
+        },
         ...handshakeData.history,
       ];
       await this.saveConversation(socketId, { messages });
@@ -256,7 +259,9 @@ export class Kooby {
     const existing = await this.loadConversation(socketId);
     if (!existing) {
       await this.saveConversation(socketId, {
-        messages: [{ role: "system", content: this.INITIAL_PROMPT }],
+        messages: [
+          { role: "system", content: prompt1(handshakeData.metadata ?? {}) },
+        ],
       });
     }
   }
@@ -264,7 +269,7 @@ export class Kooby {
   async resetConversationState(socketId) {
     logger.debug("Conversation reset", { socketId });
     await this.saveConversation(socketId, {
-      messages: [{ role: "system", content: this.INITIAL_PROMPT }],
+      messages: [{ role: "system", content: prompt1({}) }],
     });
   }
 

@@ -61,6 +61,7 @@ function offsetTopWithinScrollContainer(el, container) {
  * @param {boolean} [props.hideLabels] — hide pill text until hover or focus (default false)
  * @param {boolean} [props.fadeLabels] — dim pill text until hover or focus; ignored if hideLabels (default false)
  * @param {(detail: { index: number; item: NavItem; depth: number }) => void} [props.onSelect] — click / activate
+ * @param {number} [props.selectedNavIndex] — when set, syncs selection (e.g. from server `update.kram`)
  * @param {string} [props.className]
  */
 export function Kram({
@@ -75,6 +76,7 @@ export function Kram({
   hideLabels = false,
   fadeLabels = false,
   onSelect,
+  selectedNavIndex: selectedNavIndexProp,
   className = "",
 }) {
   const rows = useMemo(() => {
@@ -280,6 +282,34 @@ export function Kram({
     },
     [onSelect, scrollPillIntoNavCenter],
   );
+
+  /** Sync controlled `selectedNavIndex` and scroll into view when it changes externally (e.g. server tool). Skip scroll when state already matches — user clicks scroll via `handleSelect`. */
+  useLayoutEffect(() => {
+    if (selectedNavIndexProp === undefined) return;
+    if (selectedNavIndexProp === null) {
+      setSelectedIndex(null);
+      return;
+    }
+    const idx = selectedNavIndexProp;
+    if (!Number.isFinite(idx) || idx < 0 || idx >= rows.length) return;
+
+    const alreadySynced = selectedIndex === idx;
+    setSelectedIndex(idx);
+    if (alreadySynced) return;
+
+    const btn = pillRefs.current[idx];
+    if (!btn) return;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        scrollPillIntoNavCenter(btn);
+      });
+    });
+  }, [
+    selectedNavIndexProp,
+    rows.length,
+    selectedIndex,
+    scrollPillIntoNavCenter,
+  ]);
 
   const rootClass = [
     "kram",
