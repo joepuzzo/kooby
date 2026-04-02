@@ -14,6 +14,12 @@
   color: #000;
 }
 
+@media (min-width: 768px) {
+  .kooby {
+    min-width: 740px;
+  }
+}
+
 .site--app[data-theme="dark"] .kooby,
 [data-color-scheme="dark"] .kooby {
   border: none;

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.9 ( April 1st, 2026 )
+
+### Updated
+
+- Kooby to show quiet icons and have min width on large screens
+- Example app to show how to have cached conversations and load past convos
+
 ## 1.0.8 ( April 1st, 2026 )
 
 ### Updated

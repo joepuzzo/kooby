@@ -19,11 +19,37 @@ const server = http.createServer(app);
 const wss = new WebSocketServer({ server, path: "/kooby" });
 
 // Initialize Kooby for WebSocket
-new Kooby(wss);
+const kooby = new Kooby(wss);
+global.myapp = {};
+global.myapp.kooby = kooby;
 
 // Health endpoint
 app.get("/health", (req, res) => {
   res.status(200).send("OK");
+});
+
+// Example endpoint to get conversation history
+app.get("/api/convo/:id", async (req, res) => {
+  logger.info("Getting conversation history for socketId", {
+    id: req.params.id,
+  });
+  const socketId = req.params.id;
+  const kooby = global.myapp?.kooby;
+  if (!kooby) {
+    res.status(503).json({ error: "Kooby service not ready" });
+    return;
+  }
+
+  const conversationHistory = await kooby.getConversationHistory(socketId);
+  if (!conversationHistory) {
+    res.status(404).json({ error: "Conversation not found", socketId });
+    return;
+  }
+
+  res.json({
+    socketId,
+    conversationHistory,
+  });
 });
 
 // Route to dev server when developing (only development for now / no deployment)

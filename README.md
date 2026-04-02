@@ -20,42 +20,6 @@ const MyComponent = () => {
 };
 ```
 
-## With Auth Token ( JWT )
-
-```jsx
-// Import the kooby component
-import { Kooby } from "kooby";
-
-const MyComponent = () => {
-  return (
-    <Kooby url="ws://localhost:8000" token="asdf...">
-      <Kooby.Toolbar />
-      <Kooby.Conversation />
-      <Kooby.ConnectionStatus />
-      <Kooby.TextBox />
-    </Kooby>
-  );
-};
-```
-
-## With Only URL
-
-```jsx
-// Import the kooby component
-import { Kooby } from "kooby";
-
-const MyComponent = () => {
-  return (
-    <Kooby url="ws://localhost:8000">
-      <Kooby.Toolbar />
-      <Kooby.Conversation />
-      <Kooby.ConnectionStatus />
-      <Kooby.TextBox />
-    </Kooby>
-  );
-};
-```
-
 ## With metadata
 
 ```jsx
@@ -67,8 +31,6 @@ const MyComponent = () => {
       url="ws://localhost:8000"
       metadata={{
         user: "Joe",
-        topic: "Chargers",
-        project: "digital-experience/ocw-barker",
       }}
     >
       <Kooby.Toolbar />

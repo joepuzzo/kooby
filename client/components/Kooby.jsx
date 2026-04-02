@@ -341,7 +341,7 @@ const Toolbar = ({ children, expandable = true, reset = true }) => {
       {children ? children({ agent, conversation, socketId }) : null}
       {reset && (
         <TooltipTrigger>
-          <ActionButton aria-label="Reset" onPress={resetConversation}>
+          <ActionButton aria-label="Reset" onPress={resetConversation} isQuiet>
             <Refresh />
           </ActionButton>
           <Tooltip>Reset</Tooltip>
@@ -349,7 +349,7 @@ const Toolbar = ({ children, expandable = true, reset = true }) => {
       )}
       {expandable && (
         <TooltipTrigger>
-          <ActionButton aria-label="Expand" onPress={toggleFocus}>
+          <ActionButton aria-label="Expand" onPress={toggleFocus} isQuiet>
             <OpenIn />
           </ActionButton>
           <Tooltip>Expand</Tooltip>

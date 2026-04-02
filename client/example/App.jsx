@@ -1,7 +1,16 @@
-import { ActionButton, Button, Provider, Text } from "@react-spectrum/s2";
+import {
+  ActionButton,
+  Button,
+  ProgressCircle,
+  Provider,
+  Text,
+  Tooltip,
+  TooltipTrigger,
+} from "@react-spectrum/s2";
 import BrightnessContrast from "@react-spectrum/s2/icons/BrightnessContrast";
 import Copy from "@react-spectrum/s2/icons/Copy";
 import FileText from "@react-spectrum/s2/icons/FileText";
+import Share from "@react-spectrum/s2/icons/Share";
 import Settings from "@react-spectrum/s2/icons/Settings";
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -11,6 +20,7 @@ import { Input } from "../components/inputs/Input.jsx";
 import { TextArea } from "../components/inputs/TextArea.jsx";
 import { Mermaid } from "./chat-components/Mermaid.jsx";
 import { QR } from "./chat-components/QR.jsx";
+import { useGet } from "./useGet.jsx";
 
 export const mdjsx = {
   overrides: {
@@ -36,21 +46,74 @@ const CustomToolbar = ({
     navigator.clipboard.writeText(conversationJson);
   };
 
-  const copySocketId = () => {
-    navigator.clipboard.writeText(socketId);
+  const copyFullConversation = async () => {
+    try {
+      if (!socketId) {
+        throw new Error("Missing socketId");
+      }
+
+      const response = await fetch(
+        `/api/convo/${encodeURIComponent(socketId)}`,
+      );
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch full conversation (${response.status})`,
+        );
+      }
+      const payload = await response.json();
+      await navigator.clipboard.writeText(
+        JSON.stringify(payload.conversationHistory, null, 2),
+      );
+    } catch (error) {
+      console.error("Error copying full conversation", error);
+      // Fallback to current in-memory conversation shown in the UI.
+      const fallbackConversation = JSON.stringify(conversation, null, 2);
+      await navigator.clipboard.writeText(fallbackConversation);
+    }
+  };
+
+  const copyShareLink = () => {
+    const shareLink = `${window.location.origin}/convo/${socketId}`;
+    navigator.clipboard.writeText(shareLink);
   };
 
   return (
     <>
-      <ActionButton aria-label="Copy conversation" onPress={copyConversation}>
-        <Copy />
-      </ActionButton>
-      <ActionButton aria-label="Copy test" onPress={copySocketId}>
-        <FileText />
-      </ActionButton>
+      <TooltipTrigger>
+        <ActionButton
+          aria-label="Copy full conversation"
+          onPress={copyConversation}
+          isQuiet
+        >
+          <Copy isQuiet />
+        </ActionButton>
+        <Tooltip>Copy conversation</Tooltip>
+      </TooltipTrigger>
+
+      <TooltipTrigger>
+        <ActionButton
+          aria-label="Copy full conversation"
+          onPress={copyFullConversation}
+          isQuiet
+        >
+          <FileText />
+        </ActionButton>
+        <Tooltip>Copy full conversation</Tooltip>
+      </TooltipTrigger>
+      <TooltipTrigger>
+        <ActionButton
+          aria-label="Copy share link"
+          onPress={copyShareLink}
+          isQuiet
+        >
+          <Share />
+        </ActionButton>
+        <Tooltip>Copy share link</Tooltip>
+      </TooltipTrigger>
       <ActionButton
         aria-label={isDarkTheme ? "Use light theme" : "Use dark theme"}
         onPress={toggleTheme}
+        isQuiet
       >
         <BrightnessContrast />
       </ActionButton>
@@ -73,7 +136,14 @@ const App = () => {
 
   const formApiRef = useRef();
 
-  console.log("convoId", convoId);
+  const [loading, error, convoData] = useGet({
+    url: convoId ? `/api/convo/${convoId}` : "",
+    lazy: !convoId,
+  });
+
+  const koobyConversation = convoId
+    ? convoData?.conversationHistory
+    : undefined;
 
   // Spectrum Provider themes via CSS classes, not data-color-scheme. We mirror the
   // scheme on <html> so global CSS (e.g. Kooby.css) and DevTools match the toggle.
@@ -190,17 +260,41 @@ const App = () => {
                 </div>
               </Form>
             </div>
+            {loading && (
+              <Text
+                UNSAFE_style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  marginBottom: 16,
+                }}
+              >
+                <ProgressCircle
+                  size="S"
+                  aria-label="Loading conversation"
+                  isIndeterminate
+                />
+                Loading conversation…
+              </Text>
+            )}
+            {error && (
+              <Text
+                UNSAFE_style={{
+                  display: "block",
+                  marginBottom: 16,
+                  color: "var(--spectrum-global-color-red-600)",
+                }}
+              >
+                Could not load this conversation: {error?.message}
+              </Text>
+            )}
             <Kooby
               url={config.url}
               debug={debug}
               context={config.context}
               agent="Kooby"
-              // conversation={[
-              //   {
-              //     role: "user",
-              //     content: "Hi, I would like to know about the barker project",
-              //   },
-              // ]}
+              conversation={koobyConversation}
+              socketId={convoId}
             >
               <Kooby.Toolbar>
                 {({ conversation, socketId }) => {
