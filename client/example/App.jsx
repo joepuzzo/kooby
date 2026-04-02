@@ -14,12 +14,14 @@ import Share from "@react-spectrum/s2/icons/Share";
 import Settings from "@react-spectrum/s2/icons/Settings";
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Kram } from "../components/Kram.jsx";
 import { Kooby } from "../components/Kooby.jsx";
 import { Form } from "../components/inputs/Form.jsx";
 import { Input } from "../components/inputs/Input.jsx";
 import { TextArea } from "../components/inputs/TextArea.jsx";
 import { Mermaid } from "./chat-components/Mermaid.jsx";
 import { QR } from "./chat-components/QR.jsx";
+import { kramNav } from "./kramNav.js";
 import { useGet } from "./useGet.jsx";
 
 export const mdjsx = {
@@ -194,6 +196,16 @@ const App = () => {
   return (
     <Provider colorScheme={isDarkTheme ? "dark" : "light"} background="base">
       <div className="site--app">
+        <Kram
+          nav={kramNav}
+          hideLabels
+          onSelect={({ item, index, depth }) => {
+            setConfig((prev) => ({
+              ...prev,
+              context: `Currnet kram selection: ${item.label}`,
+            }));
+          }}
+        />
         <main className="site--app-main">
           <div
             style={{

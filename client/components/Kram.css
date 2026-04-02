@@ -1,0 +1,143 @@
+.kram {
+  --kram-min-gap: 16px;
+  position: fixed;
+  left: 0;
+  top: 10vh;
+  top: 10dvh;
+  z-index: 1000;
+  box-sizing: border-box;
+  width: max-content;
+  height: 80vh;
+  height: 80dvh;
+  max-height: 80vh;
+  max-height: 80dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: var(--kram-min-gap);
+  padding-top: max(12px, env(safe-area-inset-top, 0px));
+  padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+  padding-left: 10px;
+  padding-right: 40px;
+  margin: 0;
+  background: transparent;
+  border: none;
+  list-style: none;
+  pointer-events: auto;
+  overflow-y: auto;
+  overflow-x: visible;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.kram::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.kram-pill {
+  flex-shrink: 0;
+  box-sizing: border-box;
+  padding: 0 10px;
+  border: none;
+  border-radius: 5px 5px 5px 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: left center;
+  /* No opacity transition: scroll-driven opacity updates every frame; animating it causes shimmer */
+  transition:
+    transform 0.22s cubic-bezier(0.25, 0.8, 0.25, 1),
+    box-shadow 0.22s ease;
+  overflow: hidden;
+  color: #fff;
+  font-family:
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    sans-serif;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.kram-pill:focus {
+  outline: none;
+}
+
+.kram-pill:focus-visible {
+  outline: 2px solid #0f172a;
+  outline-offset: 2px;
+}
+
+.kram-pill__label {
+  white-space: nowrap;
+  pointer-events: none;
+  font-weight: 500;
+  transition: font-weight 0.12s ease;
+}
+
+.kram--hide-labels .kram-pill__label {
+  opacity: 0;
+  transition:
+    opacity 0.15s ease,
+    font-weight 0.12s ease;
+}
+
+.kram--hide-labels .kram-pill--hover .kram-pill__label,
+.kram--hide-labels .kram-pill:focus-visible .kram-pill__label,
+.kram--hide-labels .kram-pill--selected .kram-pill__label {
+  opacity: 1;
+}
+
+.kram--fade-labels .kram-pill__label {
+  opacity: 0.69;
+  transition:
+    opacity 0.15s ease,
+    font-weight 0.12s ease;
+}
+
+.kram--fade-labels .kram-pill--hover .kram-pill__label,
+.kram--fade-labels .kram-pill:focus-visible .kram-pill__label,
+.kram--fade-labels .kram-pill--selected .kram-pill__label {
+  opacity: 1;
+}
+
+.kram-pill--hover .kram-pill__label,
+.kram-pill:focus-visible .kram-pill__label {
+  font-weight: 700;
+}
+
+.kram-pill--selected {
+  z-index: 6;
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.95),
+    0 4px 18px rgba(15, 23, 42, 0.35);
+}
+
+.kram-pill--hover {
+  z-index: 5;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.18);
+}
+
+.kram-pill--selected.kram-pill--hover {
+  z-index: 7;
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.95),
+    0 4px 18px rgba(15, 23, 42, 0.35);
+}
+
+.kram-pill--near-1 {
+  z-index: 4;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.12);
+}
+
+.kram-pill--near-2 {
+  z-index: 3;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
