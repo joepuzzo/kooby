@@ -1,5 +1,7 @@
 .kooby {
   max-width: 1000px;
+  width: 100%;
+  min-width: 0;
   height: 100%;
   max-height: 90vh;
   padding: 30px;
@@ -50,7 +52,9 @@
   flex-direction: column;
   gap: 30px;
   flex: 2;
-  overflow: scroll;
+  min-width: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
 
   scrollbar-width: none;
 }
@@ -67,6 +71,15 @@
   display: flex;
   align-items: flex-start;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Message body (markdown + custom blocks): allow shrinking so wide tables don’t overflow the column */
+.kooby-message > div:last-child {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .kooby-message-role {
@@ -115,7 +128,11 @@
 
 .kooby-content {
   padding: 10px;
+  box-sizing: border-box;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
   text-align: left;
   color: #000;
   margin-top: 5px;

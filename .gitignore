@@ -5,3 +5,4 @@ token_grok_old.txt
 web
 dist
 stats.html
+.DS_Store

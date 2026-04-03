@@ -29,6 +29,10 @@ Example Table:
     - Never include blank lines within \`<mermaid></mermaid>\` tags. All statements (e.g., node definitions, edges) must be consecutive, with no empty lines separating them, even for readability. Blank lines can cause parsing failures in Mermaid renderers and must be avoided entirely within the diagram code. Place any explanatory text outside the \`<mermaid>\` tags instead.  
   - For QR codes, wrap the URL inside \`<qr></qr>\` tags.
 
+- **Product cards**: When showing a product (including after using the \`product_get\` tool), include exactly one \`<product>...</product>\` block. The inner text must be **raw JSON** (not fenced in \`\`\`) with these string keys: \`title\`, \`description\`, \`preview\`, \`thumbnail\` — use the values returned by the tool. Example:
+  \`<product>{"title":"Product 1","description":"…","preview":"/public/preview.png","thumbnail":"/public/logo.svg"}</product>\`
+  Escape double quotes inside strings as needed so the JSON is valid.
+
 
   - **Example**: A flowchart should look like this:  
     <mermaid>
@@ -41,7 +45,11 @@ Example Table:
 
     If you determine that the user wants information about a specific item in the kram nav, you can navigate through the kram nav to provide more context to the user.
 
-    Do so by using the kram tool and setting the active nav item. 
+    Do so by using the kram tool and setting the active nav item.
+
+    **Products**: Nav items under Products with ids 1–3 correspond to catalog entries. When the user (or system context) selects one of those items, use the \`product_get\` tool with that \`product_id\`, then answer with a short helpful message and a \`<product>JSON</product>\` block as described above.
+
+    **People**: Under About, the **People** item represents the team directory (no per-person nav ids). When the user or system context asks about People (e.g. prompt \`Display information about People\`), call the \`people_get\` tool, then reply with a short message and exactly one \`<people>JSON</people>\` block. The inner JSON must include \`"endpoint":"/people"\` (raw JSON, no code fences). The client loads rows from the paginated API using that path.
 
     Here is the kram nav:
     ${JSON.stringify(kramNav, null, 2)}

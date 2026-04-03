@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { ChatManager } from "./ChatManager";
 import {
   ActionButton,
@@ -117,19 +117,7 @@ const Feedback = ({
   const [negativeFeedback, setNegativeFeedback] = useState("");
 
   if (loading && currentMessage) {
-    return (
-      <div
-        className="kooby-feedback"
-        style={{ marginTop: "-35px", marginLeft: "-40px" }}
-      >
-        <ProgressCircle
-          size="M"
-          isIndeterminate
-          aria-label="Loading"
-          staticColor="white"
-        />
-      </div>
-    );
+    return null; // Hide the feedback when loading
   }
 
   if (show) {
@@ -208,6 +196,29 @@ const Content = ({
   );
 };
 
+const LoadingSpinner = ({ index, conversation, loading }) => {
+  const currentMessage = index === conversation.length - 1;
+
+  if (loading && currentMessage) {
+    return (
+      <div
+        className="kooby-feedback"
+        style={{
+          marginTop: "-2px",
+          marginLeft: "30px",
+        }}
+      >
+        <ProgressCircle
+          size="M"
+          isIndeterminate
+          aria-label="Loading"
+          staticColor="white"
+        />
+      </div>
+    );
+  }
+};
+
 const Conversation = ({
   mdjsx,
   feedback = true,
@@ -244,6 +255,11 @@ const Conversation = ({
                 ? "Kooby"
                 : message.role.charAt(0).toUpperCase() + message.role.slice(1)}
             </strong>
+            <LoadingSpinner
+              index={index}
+              conversation={filteredConvo}
+              loading={loading}
+            />
           </div>
           <Content
             mdjsx={mdjsx}
@@ -529,21 +545,29 @@ export const Kooby = ({
     };
   }, [url, agent, token, socketId]);
 
-  useEffect(() => {
-    if (socketManagerRef.current && context) {
-      console.log("Setting context", context);
+  const updateContext = useCallback((cntxt) => {
+    if (socketManagerRef.current && cntxt) {
+      console.log("Setting context", cntxt);
       setConversation((prev) => [
         ...prev,
         {
           role: "system",
-          content: context,
+          content: cntxt.info,
         },
       ]);
 
       socketManagerRef.current.sendMessage({
-        context,
+        context: cntxt,
       });
+
+      if (cntxt.prompt) {
+        setLoading(true);
+      }
     }
+  }, []);
+
+  useEffect(() => {
+    updateContext(context);
   }, [context]);
 
   const resetConversation = () => {
@@ -568,8 +592,17 @@ export const Kooby = ({
       context,
       setLoading,
       loading,
+      updateContext,
     }),
-    [conversation, isConnected, socketId, agent, responding, context],
+    [
+      conversation,
+      isConnected,
+      socketId,
+      agent,
+      responding,
+      context,
+      updateContext,
+    ],
   );
 
   if (apiRef) {

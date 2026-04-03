@@ -5,6 +5,8 @@ import logger from "./logger.js";
 import { AdminTool } from "./tools/adminTool.js";
 import { KramTool } from "./tools/kramTool.js";
 import { MathTool } from "./tools/mathTool.js";
+import { PeopleTool } from "./tools/peopleTool.js";
+import { ProductTool } from "./tools/productTool.js";
 import { prompt1 } from "./prompts/prompt1.js";
 
 /** xAI Grok (OpenAI-compatible): https://docs.x.ai/docs/overview */
@@ -29,7 +31,13 @@ export class Kooby {
       baseURL: process.env.GROK_BASE_URL || DEFAULT_BASE_URL,
     });
     this.model = process.env.GROK_MODEL || DEFAULT_MODEL;
-    this.tools = [new MathTool(), new AdminTool(), new KramTool()];
+    this.tools = [
+      new MathTool(),
+      new AdminTool(),
+      new KramTool(),
+      new ProductTool(),
+      new PeopleTool(),
+    ];
     this.toolDefinitions = this.tools.flatMap((tool) =>
       tool.getToolDefinitions(),
     );
@@ -62,6 +70,13 @@ export class Kooby {
           } else if (data.context) {
             if (!socketId) return;
             await this.updateContext(socketId, data);
+            // If data also had a prompt call then handle the prompt
+            if (data.context.prompt) {
+              await this.handlePrompt(ws, socketId, {
+                // ...data,
+                input: data.context.prompt,
+              });
+            }
           }
         } catch (error) {
           logger.error("Error processing WebSocket message", { error });
@@ -274,7 +289,7 @@ export class Kooby {
   }
 
   async handlePrompt(ws, socketId, data) {
-    logger.debug("Prompt received");
+    logger.debug("Prompt received", data.input);
 
     const state = await this.loadConversation(socketId);
     if (!state) {
@@ -297,8 +312,7 @@ export class Kooby {
       logger.warn("No conversation in cache for socket", { socketId });
       return;
     }
-
-    state.messages.push({ role: "system", content: data.context });
+    state.messages.push({ role: "system", content: data.context.info });
     await this.saveConversation(socketId, state);
   }
 

@@ -5,10 +5,7 @@ import macros from "unplugin-parcel-macros";
 // https://vitejs.dev/config/
 // React Spectrum S2: https://react-spectrum.adobe.com/getting-started
 export default defineConfig({
-  plugins: [
-    macros.vite(),
-    react()
-  ],
+  plugins: [macros.vite(), react()],
   root: "client/example",
   publicDir: "public",
   build: {
@@ -18,18 +15,24 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (/macro-(.*)\.css$/.test(id) || /@react-spectrum\/s2\/.*\.css$/.test(id)) {
+          if (
+            /macro-(.*)\.css$/.test(id) ||
+            /@react-spectrum\/s2\/.*\.css$/.test(id)
+          ) {
             return "s2-styles";
           }
-        }
-      }
-    }
+        },
+      },
+    },
   },
   server: {
     port: 9002,
     strictPort: true,
     hmr: {
-      clientPort: 9002
-    }
-  }
+      clientPort: 9002,
+    },
+    proxy: {
+      "/api": "http://localhost:3000",
+    },
+  },
 });

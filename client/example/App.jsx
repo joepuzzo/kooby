@@ -23,6 +23,8 @@ import { Mermaid } from "./chat-components/Mermaid.jsx";
 import { QR } from "./chat-components/QR.jsx";
 import { kramNav } from "./kramNav.js";
 import { useGet } from "./useGet.jsx";
+import { Product } from "./chat-components/Product.jsx";
+import { People } from "./chat-components/People.jsx";
 
 export const mdjsx = {
   overrides: {
@@ -31,6 +33,12 @@ export const mdjsx = {
     },
     qr: {
       component: QR,
+    },
+    product: {
+      component: Product,
+    },
+    people: {
+      component: People,
     },
   },
 };
@@ -191,7 +199,10 @@ const App = () => {
 
     setConfig({
       url,
-      context,
+      context: {
+        info: context,
+        // Dont send prompt for this type of context update
+      },
     });
   };
 
@@ -200,16 +211,19 @@ const App = () => {
       <div className="site--app">
         <Kram
           nav={kramNav}
-          hideLabels
+          // hideLabels
           apiRef={kramApiRef}
           onSelect={({ item }) => {
             setConfig((prev) => ({
               ...prev,
-              context: `Currnet kram selection: ${item.label}`,
+              context: {
+                info: `Currnet kram selection: ${item.label}`,
+                prompt: `Display information about ${item.label}`,
+              },
             }));
           }}
         />
-        <main className="site--app-main">
+        <main className="site--app-main" style={{ marginLeft: "260px" }}>
           <div
             style={{
               display: "flex",

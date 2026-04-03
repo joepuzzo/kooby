@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 
-export const useGet = ({ url, headers = {}, onComplete, lazy = false }) => {
+/** Stable reference when callers omit `headers` so `get` is not recreated every render. */
+const DEFAULT_HEADERS = {};
+
+export const useGet = ({ url, headers = DEFAULT_HEADERS, onComplete, lazy = false }) => {
   const [state, setState] = useState({
     loading: !lazy,
     error: null,

@@ -7,9 +7,9 @@ export const kramNav = {
         {
           label: "Products",
           items: [
-            { label: "Product 1" },
-            { label: "Product 2" },
-            { label: "Product 3" },
+            { label: "Product 1", id: 1 },
+            { label: "Product 2", id: 2 },
+            { label: "Product 3", id: 3 },
           ],
         },
         {

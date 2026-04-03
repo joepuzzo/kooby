@@ -39,6 +39,19 @@
   height: 0;
 }
 
+.kram-tree-root .kram-tree-link {
+  color: inherit;
+  text-decoration: none;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kram-tree-root .kram-tree-link:hover {
+  text-decoration: underline;
+}
+
 .kram-pill {
   flex-shrink: 0;
   box-sizing: border-box;
