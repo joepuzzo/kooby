@@ -68,9 +68,8 @@ function NavTreeItems({ items, pathPrefix }) {
   if (!items?.length) return null;
   return items.map((item, index) => {
     const id = pathPrefix !== "" ? `${pathPrefix}.${index}` : `${index}`;
-    const href = item.href ?? `#${item.label}`;
     return (
-      <TreeViewItem key={id} id={id} textValue={item.label} href={href}>
+      <TreeViewItem key={id} id={id} textValue={item.label} href={item.href}>
         <TreeViewItemContent>{item.label}</TreeViewItemContent>
         {item.items?.length ? (
           <NavTreeItems items={item.items} pathPrefix={id} />
@@ -90,14 +89,6 @@ export function Kram({ nav, onSelect, apiRef, className = "" }) {
 
   const flatRows = useMemo(() => flattenNavRows(items, 0, "", []), [items]);
 
-  const idToRow = useMemo(() => {
-    const m = new Map();
-    for (const row of flatRows) {
-      m.set(row.id, row);
-    }
-    return m;
-  }, [flatRows]);
-
   const allExpandableIds = useMemo(() => {
     const ids = [];
     function walk(navItems, pathPrefix) {
@@ -113,7 +104,6 @@ export function Kram({ nav, onSelect, apiRef, className = "" }) {
     return ids;
   }, [items]);
 
-  const [selectedKeys, setSelectedKeys] = useState(() => new Set());
   const [expandedKeys, setExpandedKeys] = useState(
     () => new Set(allExpandableIds),
   );
@@ -122,62 +112,40 @@ export function Kram({ nav, onSelect, apiRef, className = "" }) {
     setExpandedKeys(new Set(allExpandableIds));
   }, [allExpandableIds]);
 
-  const applySelectionKeys = useCallback(
-    (keys) => {
-      setSelectedKeys(keys);
-      if (keys === "all") return;
-      const first =
-        keys && typeof keys === "object" && "size" in keys && keys.size > 0
-          ? [...keys][0]
-          : null;
-      if (first == null) return;
-      const row = idToRow.get(String(first));
-      if (row && onSelect) {
-        onSelect({ item: row.item, depth: row.depth, index: row.index });
-      }
-    },
-    [idToRow, onSelect],
-  );
-
+  /** Expands ancestors so the row at `navIndex` is visible (e.g. Kooby kram tool). */
   const setSelectedNavIndex = useCallback(
     (navIndex) => {
-      if (navIndex == null) {
-        setSelectedKeys(new Set());
-        return;
-      }
+      if (navIndex == null) return;
       const row = flatRows[navIndex];
-      if (row) {
-        setSelectedKeys(new Set([row.id]));
-        const parts = row.id.split(".");
-        const ancestors = [];
-        for (let i = 1; i < parts.length; i++) {
-          ancestors.push(parts.slice(0, i).join("."));
-        }
-        if (ancestors.length) {
-          setExpandedKeys((prev) => {
-            const next = new Set(prev);
-            for (const a of ancestors) {
-              next.add(a);
-            }
-            return next;
-          });
-        }
+      if (!row) return;
+      const parts = row.id.split(".");
+      const ancestors = [];
+      for (let i = 1; i < parts.length; i++) {
+        ancestors.push(parts.slice(0, i).join("."));
       }
+      if (!ancestors.length) return;
+      setExpandedKeys((prev) => {
+        const next = new Set(prev);
+        for (const a of ancestors) {
+          next.add(a);
+        }
+        return next;
+      });
     },
     [flatRows],
   );
 
-  useEffect(() => {
-    if (!apiRef) return;
-    apiRef.current = {
-      setSelectedNavIndex,
-    };
-    return () => {
-      apiRef.current = null;
-    };
-  }, [apiRef, setSelectedNavIndex]);
+  // useEffect(() => {
+  //   if (!apiRef) return;
+  //   apiRef.current = {
+  //     setSelectedNavIndex,
+  //   };
+  //   return () => {
+  //     apiRef.current = null;
+  //   };
+  // }, [apiRef, setSelectedNavIndex]);
 
-  /** Hash → onSelect + tree highlight, same flow as old Tesla SideNav + hashchange. */
+  /** Hash → expand path to row + onSelect. */
   useEffect(() => {
     const handleHashChange = () => {
       const raw = window.location.hash.slice(1);
@@ -236,9 +204,6 @@ export function Kram({ nav, onSelect, apiRef, className = "" }) {
         <TreeView
           aria-label="Site navigation"
           selectionMode="none"
-          disallowEmptySelection={false}
-          selectedKeys={selectedKeys}
-          onSelectionChange={applySelectionKeys}
           expandedKeys={expandedKeys}
           onExpandedChange={setExpandedKeys}
           styles={style({

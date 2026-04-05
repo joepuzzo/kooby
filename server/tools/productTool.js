@@ -44,7 +44,7 @@ export class ProductTool extends Tool {
     });
 
     this.defineFunction({
-      name: "get",
+      name: "get_by_id",
       description:
         "Returns title, label, description, preview URL, and thumbnail URL for the given product id.",
       parameters: {
@@ -67,7 +67,7 @@ export class ProductTool extends Tool {
         return {
           product,
           render_instructions:
-            "In your assistant message, include exactly one block: <product>JSON</product> where JSON is a single JSON object (no code fences) with keys title, description, preview, thumbnail copied from the product object above. Example shape: <product>{\"title\":\"...\",\"description\":\"...\",\"preview\":\"...\",\"thumbnail\":\"...\"}</product>",
+            'In your assistant message, include exactly one block: <product>JSON</product> where JSON is a single JSON object (no code fences) with keys title, description, preview, thumbnail copied from the product object above. Example shape: <product>{"title":"...","description":"...","preview":"...","thumbnail":"..."}</product>',
         };
       },
     });

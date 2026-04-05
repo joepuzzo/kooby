@@ -82,7 +82,7 @@ export const People = ({ children }) => {
       }
       updateContext({
         info: `Current person selection: ${person.name} (${person.title})`,
-        prompt: `Display information about ${person.name}`,
+        prompt: `Display information about ${person.name} with id ${person.id}`,
       });
     },
     [rows, updateContext],

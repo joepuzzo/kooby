@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import { ChatManager } from "./ChatManager";
 import {
   ActionButton,
@@ -78,6 +84,20 @@ export const useKooby = () => {
   const context = React.useContext(KoobyContext);
   if (!context) {
     throw new Error("useKooby must be used within a KoobyProvider");
+  }
+  return context;
+};
+
+/* -------------------- Message Context -------------------- */
+
+const KoobyMessageContext = React.createContext();
+
+export const useKoobyMessage = () => {
+  const context = React.useContext(KoobyMessageContext);
+  if (!context) {
+    throw new Error(
+      "useKoobyMessage must be used within a KoobyMessageProvider",
+    );
   }
   return context;
 };
@@ -247,34 +267,48 @@ const Conversation = ({
 
   return (
     <div className="kooby-conversation">
-      {filteredConvo.map((message, index) => (
-        <div key={index} className="kooby-message">
-          <div className={`kooby-message-role kooby-${message.role}`}>
-            <strong>
-              {message.role === "assistant" || message.role === "system"
-                ? "Kooby"
-                : message.role.charAt(0).toUpperCase() + message.role.slice(1)}
-            </strong>
-            <LoadingSpinner
-              index={index}
-              conversation={filteredConvo}
-              loading={loading}
-            />
-          </div>
-          <Content
-            mdjsx={mdjsx}
-            feedback={feedback}
-            responding={responding}
-            loading={loading}
-            index={index}
-            message={message}
-            conversation={filteredConvo}
-            positive={positive}
-            negative={negative}
-            showFeedbackOnAllMessages={showFeedbackOnAllMessages}
-          />
-        </div>
-      ))}
+      {filteredConvo.map((message, index) => {
+        const currentMessage = index === filteredConvo.length - 1;
+        return (
+          <KoobyMessageContext.Provider
+            value={{
+              message,
+              index,
+              currentMessage,
+              totalMessages: conversation.length,
+            }}
+            key={`${message.role}-${index}-provider`}
+          >
+            <div key={`${message.role}-${index}`} className="kooby-message">
+              <div className={`kooby-message-role kooby-${message.role}`}>
+                <strong>
+                  {message.role === "assistant" || message.role === "system"
+                    ? "Kooby"
+                    : message.role.charAt(0).toUpperCase() +
+                      message.role.slice(1)}
+                </strong>
+                <LoadingSpinner
+                  index={index}
+                  conversation={filteredConvo}
+                  loading={loading}
+                />
+              </div>
+              <Content
+                mdjsx={mdjsx}
+                feedback={feedback}
+                responding={responding}
+                loading={loading}
+                index={index}
+                message={message}
+                conversation={filteredConvo}
+                positive={positive}
+                negative={negative}
+                showFeedbackOnAllMessages={showFeedbackOnAllMessages}
+              />
+            </div>
+          </KoobyMessageContext.Provider>
+        );
+      })}
       <div ref={conversationEndRef} />
     </div>
   );
@@ -455,7 +489,8 @@ export const Kooby = ({
   const metadataRef = useRef();
   metadataRef.current = metadata;
 
-  useEffect(() => {
+  // Make sure socket happens before anything else
+  useLayoutEffect(() => {
     if (url && !readOnly) {
       socketManagerRef.current = ChatManager.create({
         url: url,
@@ -572,7 +607,13 @@ export const Kooby = ({
 
   const resetConversation = () => {
     if (url && !readOnly && socketManagerRef.current) {
-      socketManagerRef.current.sendMessage({ reset: true });
+      socketManagerRef.current.sendMessage({
+        reset: true,
+        metadata: {
+          user_agent: navigator.userAgent,
+          ...metadataRef.current,
+        },
+      });
     }
     setConversation([defaultGreetingMessage(agent)]);
   };

@@ -3,7 +3,6 @@ import { OpenAI } from "openai";
 import { getConversationCache } from "./cache.js";
 import logger from "./logger.js";
 import { AdminTool } from "./tools/adminTool.js";
-import { KramTool } from "./tools/kramTool.js";
 import { MathTool } from "./tools/mathTool.js";
 import { PeopleTool } from "./tools/peopleTool.js";
 import { ProductTool } from "./tools/productTool.js";
@@ -34,7 +33,6 @@ export class Kooby {
     this.tools = [
       new MathTool(),
       new AdminTool(),
-      new KramTool(),
       new ProductTool(),
       new PeopleTool(),
     ];
@@ -63,7 +61,7 @@ export class Kooby {
             await this.initializeConversation(socketId, data);
           } else if (data.reset) {
             if (!socketId) return;
-            await this.resetConversationState(socketId);
+            await this.resetConversationState(socketId, data);
           } else if (data.input) {
             if (!socketId) return;
             await this.handlePrompt(ws, socketId, data);
@@ -281,10 +279,10 @@ export class Kooby {
     }
   }
 
-  async resetConversationState(socketId) {
+  async resetConversationState(socketId, data) {
     logger.debug("Conversation reset", { socketId });
     await this.saveConversation(socketId, {
-      messages: [{ role: "system", content: prompt1({}) }],
+      messages: [{ role: "system", content: prompt1(data.metadata ?? {}) }],
     });
   }
 

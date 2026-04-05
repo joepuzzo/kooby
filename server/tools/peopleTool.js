@@ -1,30 +1,61 @@
 import { Tool } from "./tool.js";
-
-const PEOPLE_ENDPOINT = "/people";
+import { PeopleService } from "../services/PeopleService.js";
 
 export class PeopleTool extends Tool {
   constructor() {
     super({
       name: "people",
       description:
-        "Returns the API endpoint for listing people (team directory). Use when the user asks about People, the team, or when kram/context refers to the People nav item (About → People). After calling, your reply must include a single <people>…</people> tag whose inner text is JSON with an endpoint field.",
+        "Get information about people in the team directory. Use when the user asks about a specific person by name or ID.",
     });
 
     this.defineFunction({
-      name: "get",
+      name: "get_by_id",
       description:
-        "Returns the REST path used to load paginated people data for the UI.",
+        "Retrieves detailed information about a specific person by their ID.",
       parameters: {
         type: "object",
-        properties: {},
-        required: [],
+        properties: {
+          id: {
+            type: "string",
+            description: "The unique identifier of the person to retrieve",
+          },
+        },
+        required: ["id"],
       },
-      handler: () => {
-        return {
-          people: { endpoint: PEOPLE_ENDPOINT },
-          render_instructions:
-            'In your assistant message, include exactly one block: <people>JSON</people> where JSON is a single JSON object (no code fences) with key "endpoint" set to "/people". Example: <people>{"endpoint":"/people"}</people>',
-        };
+      handler: ({ id }) => {
+        const person = PeopleService.getPersonById(id);
+
+        if (!person) {
+          return { error: "Person not found", id };
+        }
+
+        return { person };
+      },
+    });
+
+    this.defineFunction({
+      name: "get_by_name",
+      description:
+        "Retrieves detailed information about a specific person by their name. Performs a case-insensitive partial match.",
+      parameters: {
+        type: "object",
+        properties: {
+          name: {
+            type: "string",
+            description: "The name or partial name of the person to search for",
+          },
+        },
+        required: ["name"],
+      },
+      handler: ({ name }) => {
+        const person = PeopleService.getPersonByName(name);
+
+        if (!person) {
+          return { error: "Person not found", name };
+        }
+
+        return { person };
       },
     });
   }

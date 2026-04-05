@@ -16,6 +16,7 @@ import React, { useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Kram } from "../components/Kram.jsx";
 import { Kooby } from "../components/Kooby.jsx";
+import { Navigate } from "../components/Navigate.jsx";
 import { Form } from "../components/inputs/Form.jsx";
 import { Input } from "../components/inputs/Input.jsx";
 import { TextArea } from "../components/inputs/TextArea.jsx";
@@ -39,6 +40,9 @@ export const mdjsx = {
     },
     people: {
       component: People,
+    },
+    navigate: {
+      component: Navigate,
     },
   },
 };
@@ -186,7 +190,7 @@ const App = () => {
     url: urlQueryParam,
   });
 
-  const kramApiRef = useRef(null);
+  // const kramApiRef = useRef(null);
 
   const onSubmit = ({ values }) => {
     const { url, context } = values;
@@ -212,13 +216,19 @@ const App = () => {
         <Kram
           nav={kramNav}
           // hideLabels
-          apiRef={kramApiRef}
+          // apiRef={kramApiRef}
           onSelect={({ item }) => {
+            // This gets triggerd any time HASH # changes
+            // 1: when the user selects nav item manually
+            // 2: when the AI determines it needs to change the nav
+            console.log("Item selected", item);
             setConfig((prev) => ({
               ...prev,
               context: {
                 info: `Currnet kram selection: ${item.label}`,
-                prompt: `Display information about ${item.label}`,
+                prompt: item.instructions
+                  ? item.instructions
+                  : `Display information about ${item.label}`,
               },
             }));
           }}
@@ -325,13 +335,13 @@ const App = () => {
               conversation={koobyConversation}
               socketId={convoId}
               metadata={{ kramNav }}
-              onUpdate={(update) => {
-                if (update?.kram && "selectedNavIndex" in update.kram) {
-                  kramApiRef.current?.setSelectedNavIndex?.(
-                    update.kram.selectedNavIndex,
-                  );
-                }
-              }}
+              // onUpdate={(update) => {
+              //   if (update?.kram && "selectedNavIndex" in update.kram) {
+              //     kramApiRef.current?.setSelectedNavIndex?.(
+              //       update.kram.selectedNavIndex,
+              //     );
+              //   }
+              // }}
             >
               <Kooby.Toolbar>
                 {({ conversation, socketId }) => {
