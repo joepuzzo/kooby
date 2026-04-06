@@ -46,6 +46,8 @@ Example Table:
 
     **Note if the Currnet kram selection is not yet what the user specified please return a navigate tag. Only perform tool calls on subsiquent requests.**
 
+    **ONLY RETURN <navigate> if the current kram selection is not already selected just return the infromation about that content. Do not tell the user about navigation in this case!
+
     Here is the kram nav:
     ${JSON.stringify(kramNav, null, 2)}
 `;

@@ -485,6 +485,9 @@ export const Kooby = ({
   const [responding, setResponding] = useState(false);
   const [loading, setLoading] = useState(false);
   const socketManagerRef = useRef(null);
+  /** Context to send once the WebSocket is open (connect is async; effects may run first). */
+  const pendingContextRef = useRef(null);
+  const shookHandsRef = useRef(false);
 
   const metadataRef = useRef();
   metadataRef.current = metadata;
@@ -541,6 +544,23 @@ export const Kooby = ({
           if (data.update && onUpdate) {
             onUpdate(data.update);
           }
+          if (data.setup) {
+            // The handshake is complete
+            shookHandsRef.current = true; // If we have any pending context updates now we can send
+
+            const pending = pendingContextRef.current;
+            if (pending) {
+              console.log("Pending context detected sending", pending);
+              pendingContextRef.current = null;
+              if (pending.prompt) {
+                console.log("Setting loading to true");
+                setLoading(true);
+              }
+              socketManagerRef.current.sendMessage({
+                context: pending,
+              });
+            }
+          }
         },
         onOpen: () => {
           console.log("Chat Manager Connected", metadataRef.current);
@@ -591,12 +611,19 @@ export const Kooby = ({
         },
       ]);
 
-      socketManagerRef.current.sendMessage({
-        context: cntxt,
-      });
-
-      if (cntxt.prompt) {
-        setLoading(true);
+      // If we have successfully completed the handshake then we can simply send the message!
+      // Note: maybe we need to also check connection? and put it in pending if not connected... TBD
+      if (shookHandsRef.current) {
+        socketManagerRef.current.sendMessage({
+          context: cntxt,
+        });
+        if (cntxt.prompt) {
+          setLoading(true);
+        }
+      }
+      // Handshake not yet complete so we cant send, store it in pending
+      else {
+        pendingContextRef.current = cntxt;
       }
     }
   }, []);
@@ -643,6 +670,7 @@ export const Kooby = ({
       responding,
       context,
       updateContext,
+      loading,
     ],
   );
 

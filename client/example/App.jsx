@@ -99,7 +99,7 @@ const CustomToolbar = ({
           onPress={copyConversation}
           isQuiet
         >
-          <Copy isQuiet />
+          <Copy />
         </ActionButton>
         <Tooltip>Copy conversation</Tooltip>
       </TooltipTrigger>
@@ -225,10 +225,9 @@ const App = () => {
             setConfig((prev) => ({
               ...prev,
               context: {
-                info: `Currnet kram selection: ${item.label}`,
-                prompt: item.instructions
-                  ? item.instructions
-                  : `Display information about ${item.label}`,
+                info: `Currnet kram selection: ${item.href}`,
+                instructions: item.instructions,
+                prompt: `Display information about ${item.label}`,
               },
             }));
           }}

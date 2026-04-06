@@ -164,6 +164,12 @@ export function Kram({ nav, onSelect, apiRef, className = "" }) {
       setSelectedNavIndex(row.index);
       const cb = onSelectRef.current;
       if (cb) {
+        console.log("Selected", {
+          item: row.item,
+          depth: row.depth,
+          index: row.index,
+        });
+
         cb({ item: row.item, depth: row.depth, index: row.index });
       }
     };

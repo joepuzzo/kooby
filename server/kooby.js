@@ -59,6 +59,7 @@ export class Kooby {
             socketId = data.socketId || crypto.randomUUID();
             logger.info("WebSocket handshake", { socketId });
             await this.initializeConversation(socketId, data);
+            ws.send(JSON.stringify({ setup: true }));
           } else if (data.reset) {
             if (!socketId) return;
             await this.resetConversationState(socketId, data);
@@ -255,7 +256,7 @@ export class Kooby {
   }
 
   async initializeConversation(socketId, handshakeData) {
-    console.log("initializeConversation", socketId, handshakeData);
+    logger.info("initializeConversation", socketId, handshakeData);
 
     if (handshakeData.history) {
       const messages = [
@@ -295,7 +296,11 @@ export class Kooby {
       return;
     }
 
-    state.messages.push({ role: "user", content: data.input });
+    state.messages.push({
+      role: "user",
+      content: data.input,
+    });
+
     await this.saveConversation(socketId, state);
 
     await this.getChatCompletion(state.messages, ws, data);
@@ -310,7 +315,16 @@ export class Kooby {
       logger.warn("No conversation in cache for socket", { socketId });
       return;
     }
-    state.messages.push({ role: "system", content: data.context.info });
+
+    const { info, instructions } = data.context;
+
+    if (info) {
+      state.messages.push({ role: "system", content: info });
+    }
+    if (instructions) {
+      state.messages.push({ role: "system", content: instructions });
+    }
+
     await this.saveConversation(socketId, state);
   }
 

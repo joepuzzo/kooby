@@ -18,8 +18,7 @@ function createEndpointInstructions({ entityName, tag, data, context = "" }) {
   
   Example: \`<${tag}>${JSON.stringify(data)}</${tag}>\`
   
-  REMEMBER TO always navigate to the ${entityName} page first.
-  
+REMEMBER TO always navigate to the ${entityName} page first but only if the current kram selection is not yet set.  
   ${context}
   `;
 
@@ -36,8 +35,8 @@ function createJsonInstructions({ entityName, tag, context = "" }) {
   
   Example: \`<${tag}>{"id": "7"}</${tag}>\`
   
-  REMEMBER TO always navigate to the ${entityName} page first.
-  
+  REMEMBER TO always navigate to the ${entityName} page first but only if the current kram selection is not yet set.
+
   ${context}
   `;
 
@@ -47,7 +46,7 @@ function createJsonInstructions({ entityName, tag, context = "" }) {
 // Generate instructions using the helper functions
 const PRODUCT_INSTRUCTIONS = createJsonInstructions({
   entityName: "product",
-  tag: "products",
+  tag: "product",
 });
 
 const PEOPLE_INSTRUCTIONS = createEndpointInstructions({

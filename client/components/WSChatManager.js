@@ -29,6 +29,10 @@ export class WSChatManager extends ChatManagerBase {
     this.socket.onerror = this.onError;
   }
 
+  isOpen() {
+    return Boolean(this.socket && this.socket.readyState === WebSocket.OPEN);
+  }
+
   sendMessage(message) {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(JSON.stringify(message));
