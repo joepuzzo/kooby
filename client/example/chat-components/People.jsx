@@ -80,10 +80,13 @@ export const People = ({ children }) => {
       if (!person) {
         return;
       }
-      updateContext({
-        info: `Current person selection: ${person.name} (${person.title})`,
-        prompt: `Display information about ${person.name} with id ${person.id}`,
-      });
+      // updateContext({
+      //   info: `Current person selection: ${person.name} (${person.title})`,
+      //   prompt: `Display information about ${person.name} with id ${person.id}`,
+      // });
+
+      // Navigate by setting the hash - this triggers Kram's handleHashChange
+      window.location.hash = `#about/people/${person.id}`;
     },
     [rows, updateContext],
   );

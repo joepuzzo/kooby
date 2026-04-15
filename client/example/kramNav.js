@@ -43,6 +43,15 @@ function createJsonInstructions({ entityName, tag, context = "" }) {
   return instructions;
 }
 
+// Function to generate instructions for a specific person
+const createPersonInstructions = ({ personId }) => `
+When the user or system context asks about this person (personId: ${personId}), reply with a short message and display relevant information about this person.
+
+You should fetch and display details for person ID ${personId}.
+
+REMEMBER: This is a specific person view within the People section.
+`;
+
 // Generate instructions using the helper functions
 const PRODUCT_INSTRUCTIONS = createJsonInstructions({
   entityName: "product",
@@ -106,6 +115,11 @@ export const kramNav = {
           label: "People",
           href: "#about/people",
           instructions: PEOPLE_INSTRUCTIONS,
+          item: {
+            href: "#about/people/:personId",
+            instructions: createPersonInstructions,
+            label: "Person",
+          },
         },
         { label: "Projects", href: "#about/projects" },
         { label: "Events", href: "#about/events" },

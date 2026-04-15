@@ -37,6 +37,33 @@ function flattenNavRows(items, depth, pathPrefix, out) {
 }
 
 /**
+ * Extract parameters from a URL hash against a pattern
+ * @param {string} pattern - Pattern like "about/people/:personId"
+ * @param {string} hash - Actual hash like "about/people/7"
+ * @returns {object|null} - Params object like { personId: "7" } or null if no match
+ */
+function extractParams(pattern, hash) {
+  const patternParts = pattern.split("/");
+  const hashParts = hash.split("/");
+
+  if (patternParts.length !== hashParts.length) {
+    return null;
+  }
+
+  const params = {};
+  for (let i = 0; i < patternParts.length; i++) {
+    if (patternParts[i].startsWith(":")) {
+      const paramName = patternParts[i].slice(1);
+      params[paramName] = hashParts[i];
+    } else if (patternParts[i] !== hashParts[i]) {
+      return null;
+    }
+  }
+
+  return params;
+}
+
+/**
  * Match URL hash (decoded) to a nav row — same idea as old SideNav + findItemByLabel,
  * extended for optional `item.href`.
  * @param {{ item: NavItem; depth: number; index: number; id: string }} row
@@ -145,39 +172,66 @@ export function Kram({ nav, onSelect, apiRef, className = "" }) {
   //   };
   // }, [apiRef, setSelectedNavIndex]);
 
-  /** Hash → expand path to row + onSelect. */
   useEffect(() => {
-    const handleHashChange = () => {
-      const raw = window.location.hash.slice(1);
-      if (!raw) return;
+    if (!onSelect) return;
 
-      let decodedHash = raw;
-      try {
-        decodedHash = decodeURIComponent(raw);
-      } catch {
-        /* keep raw */
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1); // Remove the #
+      if (!hash) return; // Decode URL-encoded hash (e.g., "Product%201" -> "Product 1")
+
+      const decodedHash = decodeURIComponent(hash); // First, try to find exact match
+
+      let row = flatRows.find((r) => rowMatchesHash(r, decodedHash));
+      let matchedItem = row?.item;
+      let params = {}; // If no exact match, check for dynamic routes (item.item with params)
+
+      if (!row) {
+        for (const r of flatRows) {
+          if (r.item.item?.href) {
+            const pattern = r.item.item.href.startsWith("#")
+              ? r.item.item.href.slice(1)
+              : r.item.item.href;
+            const extractedParams = extractParams(pattern, decodedHash);
+            if (extractedParams) {
+              row = r;
+              params = extractedParams; // Use the dynamic item configuration
+              matchedItem = { ...r.item.item };
+              break;
+            }
+          }
+        }
       }
 
-      const row = flatRows.find((r) => rowMatchesHash(r, decodedHash));
-      if (!row) return;
+      if (!row || !matchedItem) return;
 
-      setSelectedNavIndex(row.index);
       const cb = onSelectRef.current;
       if (cb) {
+        // If instructions is a function, call it with params to get the string
+        if (typeof matchedItem.instructions === "function") {
+          matchedItem = {
+            ...matchedItem,
+            instructions: matchedItem.instructions(params),
+          };
+        }
+
         console.log("Selected", {
-          item: row.item,
+          item: matchedItem,
           depth: row.depth,
           index: row.index,
+          params,
         });
-
-        cb({ item: row.item, depth: row.depth, index: row.index });
+        cb({ item: matchedItem, depth: row.depth, index: row.index });
       }
-    };
+    }; // Listen for hash changes
+
+    window.addEventListener("hashchange", handleHashChange); // Call on mount if hash exists
 
     handleHashChange();
-    window.addEventListener("hashchange", handleHashChange);
-    return () => window.removeEventListener("hashchange", handleHashChange);
-  }, [flatRows, setSelectedNavIndex]);
+
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+    };
+  }, [nav]);
 
   return (
     <div
